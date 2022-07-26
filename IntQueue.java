@@ -1,5 +1,3 @@
-import javax.swing.text.html.HTMLDocument.RunElement;
-
 public class IntQueue {
 
     private int[] ar;
