@@ -17,6 +17,16 @@ public class PriorityQueue<T extends Comparable<T>> {
         this(1);
     }
 
+    // check for empty queue
+    public boolean isEmpty() {
+        return heapSize == 0;
+    }
+
+    // clear inside heap
+    public void clear() {
+
+    }
+
     // priority queue constructed using initial size
     public PriorityQueue(int sz) {
         heap = new ArrayList<>(sz);
@@ -69,9 +79,69 @@ public class PriorityQueue<T extends Comparable<T>> {
         return node1.compareTo(node2) <= 0;
     }
 
+    // insert an element into heap/priority queue
+    public void add(T elem) {
+        if(elem == null) throw new IllegalArgumentException();
+
+        if(heapSize < heapCapacity) {
+            heap.set(heapSize, elem);
+        }
+        else {
+            heap.add(elem);
+            heapCapacity++;
+        }
+        swim(heapSize);
+        heapSize++;
+
+    }
+
+    private void swim(int cur) {
+        int parent = (cur-1)/2;
+
+        while (cur > 0 && less(cur, parent)) {
+            swap(cur, parent);
+            cur = parent;
+
+            parent = (cur-1)/2;
+        }
+    }
+
+    // remove root node
+    public T poll() {
+        return removeAt(0);
+    }
+
+    private T removeAt(int cur) {
+        if(isEmpty()) return null;
+
+        heapSize--;
+        T remove_data = heap.get(cur);
+        swap(cur, heapSize);
+
+        // memory cleanup
+        heap.set(heapSize, null);
+
+        if(cur == heapSize) return remove_data;
+        T elem = heap.get(cur);
+
+        swim(cur);
+
+        if(heap.get(cur).equals(elem))
+            sink(cur);
+        return remove_data;
+    }
+
     public static void main(String[] args) {
         Integer[] pq = new Integer[] {23, 12, 67, 43, 23, 89, 10, 33};
         PriorityQueue<Integer> heap = new PriorityQueue<Integer>(pq);
+
+        heap.print();
+
+        heap.add(16);
+
+        heap.print();
+
+        heap.poll();
 
         heap.print();
     }
@@ -79,5 +149,6 @@ public class PriorityQueue<T extends Comparable<T>> {
     private void print() {
         for(int i=0;i<heapSize;i++)
             System.out.print(heap.get(i)+" ");
+        System.out.println();
     }
 }
