@@ -1,5 +1,9 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class PriorityQueue<T extends Comparable<T>> {
 
@@ -11,6 +15,9 @@ public class PriorityQueue<T extends Comparable<T>> {
 
     // heap array representation
     private List<T> heap = null;
+
+    // create map to remove node at O(log n) time and O(1) for searching
+    private Map<T, TreeSet<Integer>> map = new HashMap<>();
     
     // empty priority queue
     public PriorityQueue() {
@@ -38,8 +45,10 @@ public class PriorityQueue<T extends Comparable<T>> {
         heap = new ArrayList<>(heapCapacity);
 
         // add elements into heap
-        for(int i=0;i<heapSize;i++)
+        for(int i=0;i<heapSize;i++) {
             heap.add(elems[i]);
+            mapAdd(elems[i], i);
+        }
 
         // heapify process
         for(int i=Math.max(0, heapSize/2 -1); i>=0; i--)
@@ -70,6 +79,19 @@ public class PriorityQueue<T extends Comparable<T>> {
 
         heap.set(i, elem_j);
         heap.set(j, elem_i);
+
+        mapSwap(elem_i, elem_j, i, j);
+    }
+
+    private void mapSwap(T val1, T val2, int val1Index, int val2Index) {
+        Set<Integer> set1 = map.get(val1);
+        Set<Integer> set2 = map.get(val2);
+
+        set1.remove(val1Index);
+        set2.remove(val2Index);
+
+        set1.add(val2Index);
+        set2.add(val1Index);
     }
 
     private boolean less(int right, int left) {
@@ -90,9 +112,25 @@ public class PriorityQueue<T extends Comparable<T>> {
             heap.add(elem);
             heapCapacity++;
         }
+
+        mapAdd(elem, heapSize);
+
         swim(heapSize);
         heapSize++;
 
+    }
+
+    private void mapAdd(T elem, int index) {
+        TreeSet<Integer> set = map.get(elem);
+
+        if(set == null){
+            set = new TreeSet<>();
+            set.add(index);
+            map.put(elem, set);
+        }
+        else{   //set already exists
+            set.add(index);
+        }
     }
 
     private void swim(int cur) {
@@ -120,6 +158,7 @@ public class PriorityQueue<T extends Comparable<T>> {
 
         // memory cleanup
         heap.set(heapSize, null);
+        mapRemove(remove_data, heapSize);
 
         if(cur == heapSize) return remove_data;
         T elem = heap.get(cur);
@@ -129,6 +168,13 @@ public class PriorityQueue<T extends Comparable<T>> {
         if(heap.get(cur).equals(elem))
             sink(cur);
         return remove_data;
+    }
+
+    private void mapRemove(T value, int index) {
+        TreeSet<Integer> set = map.get(value);
+        set.remove(index);
+        if(set.size()==0)
+            map.remove(value);
     }
 
     public static void main(String[] args) {
