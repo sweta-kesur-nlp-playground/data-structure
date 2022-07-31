@@ -129,6 +129,19 @@ public class BinarySearchTree<T extends Comparable<T>> {
         inorder(node.right);
     }
 
+    // calculating height of a tree
+    public int height() {
+        return height(root);
+    }
+
+    private int height(Node node){
+        if(node == null)
+            return 0;
+        // System.out.println("Left subtree height" + height(node.left));
+        // System.out.println("Right subtree height" + height(node.right));
+        return( Math.max(height(node.left), height(node.right)) + 1);
+    }
+
     public static void main(String[] args) {
         BinarySearchTree<String> bst = new BinarySearchTree<String>();
 
@@ -141,5 +154,7 @@ public class BinarySearchTree<T extends Comparable<T>> {
         bst.add("12");
 
         bst.print(bst.root);
+
+        System.out.println(bst.height());
     }
 }
